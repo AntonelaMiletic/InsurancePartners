@@ -108,6 +108,18 @@
         const detailsModal = new bootstrap.Modal(document.getElementById('partnerDetailsModal'));
         const policyModal = new bootstrap.Modal(document.getElementById('policyModal'));
 
+        function formatDate(dateValue) {
+            const date = new Date(dateValue);
+
+            return date.toLocaleString('hr-HR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
         document.querySelectorAll('.partner-row').forEach(row => {
             row.addEventListener('click', async function () {
                 const id = this.dataset.id;
@@ -121,7 +133,7 @@
                     <tr><th>Partner number</th><td>${partner.partnerNumber}</td></tr>
                     <tr><th>Croatian PIN</th><td>${partner.croatianPIN ?? ''}</td></tr>
                     <tr><th>Partner type</th><td>${partner.partnerTypeId == 1 ? 'Personal' : 'Legal'}</td></tr>
-                    <tr><th>Created at UTC</th><td>${partner.createdAtUtc}</td></tr>
+                    <tr><th>Created at UTC</th><td>${formatDate(partner.createdAtUtc)}</td></tr>
                     <tr><th>Created by user</th><td>${partner.createdByUser}</td></tr>
                     <tr><th>Foreign</th><td>${partner.isForeign ? 'Yes' : 'No'}</td></tr>
                     <tr><th>External code</th><td>${partner.externalCode}</td></tr>
