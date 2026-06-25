@@ -1,0 +1,177 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Partners";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Partners</h2>
+    <a asp-page="/Partners/Create" class="btn btn-primary">Add new partner</a>
+</div>
+
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>Full name</th>
+            <th>Partner number</th>
+            <th>Croatian PIN</th>
+            <th>Partner type</th>
+            <th>Created at UTC</th>
+            <th>Foreign</th>
+            <th>Gender</th>
+            <th>Policy</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var partner in Model.Partners)
+        {
+            var rowClass = Model.CreatedPartnerId == partner.Id ? "table-success fw-bold" : "";
+
+            <tr class="@rowClass partner-row" data-id="@partner.Id" style="cursor:pointer;">
+                <td>@(partner.IsImportant ? "*" : "")@partner.FullName</td>
+                <td>@partner.PartnerNumber</td>
+                <td>@partner.CroatianPIN</td>
+                <td>@(partner.PartnerTypeId == 1 ? "Personal" : "Legal")</td>
+                <td>@partner.CreatedAtUtc.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@(partner.IsForeign ? "Yes" : "No")</td>
+                <td>@partner.Gender</td>
+                <td>
+                    <button type="button"
+                            class="btn btn-sm btn-outline-secondary add-policy-btn"
+                            data-id="@partner.Id">
+                        Add policy
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal fade" id="partnerDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Partner details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <tbody id="partnerDetailsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="policyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="policyForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add policy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="policyPartnerId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Policy number</label>
+                        <input id="policyNumber" class="form-control" required minlength="10" maxlength="15" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Policy amount</label>
+                        <input id="policyAmount" class="form-control" type="number" step="0.01" min="0.01" required />
+                    </div>
+
+                    <div id="policyError" class="text-danger d-none">
+                        Please enter valid policy data.
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save policy</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const detailsModal = new bootstrap.Modal(document.getElementById('partnerDetailsModal'));
+        const policyModal = new bootstrap.Modal(document.getElementById('policyModal'));
+
+        document.querySelectorAll('.partner-row').forEach(row => {
+            row.addEventListener('click', async function () {
+                const id = this.dataset.id;
+
+                const response = await fetch(`/?handler=PartnerDetails&id=${id}`);
+                const partner = await response.json();
+
+                document.getElementById('partnerDetailsBody').innerHTML = `
+                    <tr><th>Full name</th><td>${partner.fullName}</td></tr>
+                    <tr><th>Address</th><td>${partner.address ?? ''}</td></tr>
+                    <tr><th>Partner number</th><td>${partner.partnerNumber}</td></tr>
+                    <tr><th>Croatian PIN</th><td>${partner.croatianPIN ?? ''}</td></tr>
+                    <tr><th>Partner type</th><td>${partner.partnerTypeId == 1 ? 'Personal' : 'Legal'}</td></tr>
+                    <tr><th>Created at UTC</th><td>${partner.createdAtUtc}</td></tr>
+                    <tr><th>Created by user</th><td>${partner.createdByUser}</td></tr>
+                    <tr><th>Foreign</th><td>${partner.isForeign ? 'Yes' : 'No'}</td></tr>
+                    <tr><th>External code</th><td>${partner.externalCode}</td></tr>
+                    <tr><th>Gender</th><td>${partner.gender}</td></tr>
+                    <tr><th>Policy count</th><td>${partner.policyCount}</td></tr>
+                    <tr><th>Total policy amount</th><td>${partner.totalPolicyAmount}</td></tr>
+                `;
+
+                detailsModal.show();
+            });
+        });
+
+        document.querySelectorAll('.add-policy-btn').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.stopPropagation();
+
+                document.getElementById('policyPartnerId').value = this.dataset.id;
+                document.getElementById('policyNumber').value = '';
+                document.getElementById('policyAmount').value = '';
+                document.getElementById('policyError').classList.add('d-none');
+
+                policyModal.show();
+            });
+        });
+
+        document.getElementById('policyForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            const data = {
+                partnerId: parseInt(document.getElementById('policyPartnerId').value),
+                policyNumber: document.getElementById('policyNumber').value,
+                policyAmount: parseFloat(document.getElementById('policyAmount').value)
+            };
+
+            const response = await fetch('/?handler=AddPolicy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                document.getElementById('policyError').classList.remove('d-none');
+            }
+        });
+    </script>
+}

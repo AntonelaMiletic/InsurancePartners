@@ -1,0 +1,80 @@
+﻿@page
+@model InsurancePartners.Pages.Partners.CreateModel
+
+@{
+    ViewData["Title"] = "Add partner";
+}
+
+<h2>Add partner</h2>
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="Partner.FirstName"></label>
+        <input asp-for="Partner.FirstName" class="form-control" />
+        <span asp-validation-for="Partner.FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Partner.LastName"></label>
+        <input asp-for="Partner.LastName" class="form-control" />
+        <span asp-validation-for="Partner.LastName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Partner.Address"></label>
+        <input asp-for="Partner.Address" class="form-control" />
+        <span asp-validation-for="Partner.Address" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Partner.PartnerNumber"></label>
+        <input asp-for="Partner.PartnerNumber" class="form-control" />
+        <span asp-validation-for="Partner.PartnerNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Partner.CroatianPIN"></label>
+        <input asp-for="Partner.CroatianPIN" class="form-control" />
+        <span asp-validation-for="Partner.CroatianPIN" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Partner.PartnerTypeId"></label>
+        <select asp-for="Partner.PartnerTypeId" class="form-control">
+            <option value="">Choose type</option>
+            <option value="1">Personal</option>
+            <option value="2">Legal</option>
+        </select>
+        <span asp-validation-for="Partner.PartnerTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="Partner.IsForeign" class="form-check-input" />
+        <label asp-for="Partner.IsForeign" class="form-check-label"></label>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Partner.ExternalCode"></label>
+        <input asp-for="Partner.ExternalCode" class="form-control" />
+        <span asp-validation-for="Partner.ExternalCode" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Partner.Gender"></label>
+        <select asp-for="Partner.Gender" class="form-control">
+            <option value="">Choose gender</option>
+            <option value="M">M</option>
+            <option value="F">F</option>
+            <option value="N">N</option>
+        </select>
+        <span asp-validation-for="Partner.Gender" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="/Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

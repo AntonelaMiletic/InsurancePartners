@@ -1,0 +1,87 @@
+﻿@page "{id:int}"
+@model InsurancePartners.Pages.Partners.DetailsModel
+
+@{
+    ViewData["Title"] = "Partner details";
+}
+
+@if (Model.PartnerDetails != null)
+{
+    <h2>Partner details</h2>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>Full name</th>
+            <td>@Model.PartnerDetails.FullName</td>
+        </tr>
+        <tr>
+            <th>Address</th>
+            <td>@Model.PartnerDetails.Address</td>
+        </tr>
+        <tr>
+            <th>Partner number</th>
+            <td>@Model.PartnerDetails.PartnerNumber</td>
+        </tr>
+        <tr>
+            <th>Croatian PIN</th>
+            <td>@Model.PartnerDetails.CroatianPIN</td>
+        </tr>
+        <tr>
+            <th>Partner type</th>
+            <td>@(Model.PartnerDetails.PartnerTypeId == 1 ? "Personal" : "Legal")</td>
+        </tr>
+        <tr>
+            <th>Created at UTC</th>
+            <td>@Model.PartnerDetails.CreatedAtUtc.ToString("dd.MM.yyyy HH:mm")</td>
+        </tr>
+        <tr>
+            <th>Created by user</th>
+            <td>@Model.PartnerDetails.CreatedByUser</td>
+        </tr>
+        <tr>
+            <th>Foreign</th>
+            <td>@(Model.PartnerDetails.IsForeign ? "Yes" : "No")</td>
+        </tr>
+        <tr>
+            <th>External code</th>
+            <td>@Model.PartnerDetails.ExternalCode</td>
+        </tr>
+        <tr>
+            <th>Gender</th>
+            <td>@Model.PartnerDetails.Gender</td>
+        </tr>
+        <tr>
+            <th>Policy count</th>
+            <td>@Model.PartnerDetails.PolicyCount</td>
+        </tr>
+        <tr>
+            <th>Total policy amount</th>
+            <td>@Model.PartnerDetails.TotalPolicyAmount.ToString("0.00")</td>
+        </tr>
+    </table>
+
+    <h3>Add policy</h3>
+
+    <form method="post">
+        <input type="hidden" asp-for="Policy.PartnerId" />
+
+        <div class="form-group">
+            <label asp-for="Policy.PolicyNumber"></label>
+            <input asp-for="Policy.PolicyNumber" class="form-control" />
+            <span asp-validation-for="Policy.PolicyNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Policy.PolicyAmount"></label>
+            <input asp-for="Policy.PolicyAmount" class="form-control" />
+            <span asp-validation-for="Policy.PolicyAmount" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save policy</button>
+        <a asp-page="/Index" class="btn btn-secondary">Back</a>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
